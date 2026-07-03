@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Vehicle Ecosystem</title>
+  <meta name="description" content="Autonomous V2V Traffic Simulation Platform — real-time vehicle negotiation, congestion prediction, and valet parking orchestration." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a1a'/><circle cx='16' cy='16' r='6' fill='%2300eeff' filter='url(%23g)'/><defs><filter id='g'><feGaussianBlur stdDeviation='2'/></filter></defs></svg>" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #070714;
+      --surface: #0e0e1e;
+      --border: #1a1a2e;
+      --text: #c8c8d8;
+      --text-dim: #606078;
+      --accent1: #00eeff;
+      --accent2: #aa44ff;
+      --accent3: #ff6600;
+      --grad: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3));
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+    /* BANNER */
+    .banner {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #070714 0%, #0e0e28 50%, #060618 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .banner::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--bg));
+    }
+    .banner h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(0,238,255,0.3));
+    }
+    .banner p {
+      margin-top: 12px;
+      font-size: clamp(11px, 1.4vw, 15px);
+      color: var(--text-dim);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+    }
+    .banner-wave {
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 40px;
+    }
+    .banner-wave path {
+      fill: none;
+      stroke: var(--accent1);
+      stroke-width: 1;
+      opacity: 0.15;
+    }
+    .banner-wave .dash {
+      stroke: var(--accent2);
+      stroke-width: 2;
+      stroke-dasharray: 4 8;
+      opacity: 0.1;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(7,7,20,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+      gap: 8px;
+      overflow-x: auto;
+    }
+    nav a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    nav a:hover { color: var(--accent1); background: rgba(0,238,255,0.08); }
+
+    section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+    section:last-of-type { border-bottom: none; }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h2 .icon { width: 24px; height: 24px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; }
+    h2 .icon.i1 { background: rgba(0,238,255,0.15); color: var(--accent1); }
+    h2 .icon.i2 { background: rgba(170,68,255,0.15); color: var(--accent2); }
+    h2 .icon.i3 { background: rgba(255,102,0,0.15); color: var(--accent3); }
+    h2 .icon.i4 { background: rgba(0,255,136,0.15); color: #00ff88; }
+
+    .tagline {
+      font-size: 15px;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      max-width: 680px;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+    .card:hover { border-color: rgba(0,238,255,0.2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .card h3 { font-size: 14px; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--accent1); }
+    .card h3.accent2 { color: var(--accent2); }
+    .card h3.accent3 { color: var(--accent3); }
+    .card p { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+    .card ul { list-style: none; margin-top: 8px; }
+    .card li { font-size: 12.5px; color: var(--text-dim); padding: 3px 0; padding-left: 16px; position: relative; }
+    .card li::before { content: '›'; position: absolute; left: 0; color: var(--accent1); font-weight: bold; }
+
+    /* Architecture */
+    .arch {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 20px;
+      font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      overflow-x: auto;
+      white-space: pre;
+      color: var(--text-dim);
+    }
+    .arch .hl1 { color: var(--accent1); }
+    .arch .hl2 { color: var(--accent2); }
+    .arch .hl3 { color: var(--accent3); }
+    .arch .dim { color: #404058; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 14px; background: var(--surface); color: var(--text-dim); font-weight: 600; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+
+    code {
+      background: rgba(0,238,255,0.08);
+      color: var(--accent1);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+    }
+    pre {
+      background: #050510;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.7;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      color: var(--text);
+    }
+    pre .cmd { color: var(--accent2); }
+    pre .str { color: #44ff88; }
+    pre .cmt { color: #404058; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      background: rgba(0,238,255,0.1);
+      color: var(--accent1);
+      border: 1px solid rgba(0,238,255,0.2);
+    }
+    .badge.purple { background: rgba(170,68,255,0.1); color: var(--accent2); border-color: rgba(170,68,255,0.2); }
+    .badge.orange { background: rgba(255,102,0,0.1); color: var(--accent3); border-color: rgba(255,102,0,0.2); }
+    .badge.green { background: rgba(0,255,136,0.1); color: #00ff88; border-color: rgba(0,255,136,0.2); }
+
+    .roadmap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+    .roadmap-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .roadmap-item.done { border-left: 3px solid #00ff88; }
+    .roadmap-item.todo { border-left: 3px solid var(--text-dim); opacity: 0.7; }
+
+    .footer {
+      text-align: center;
+      padding: 40px 0 60px;
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+    .footer a { color: var(--accent1); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    .glow-line {
+      height: 2px;
+      background: var(--grad);
+      opacity: 0.3;
+      margin: 0 auto 56px;
+      width: 120px;
+      border-radius: 2px;
+    }
+
+    @media (max-width: 640px) {
+      .banner { height: 200px; }
+      section { padding: 40px 0; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .arch { font-size: 10px; padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- BANNER -->
+<header class="banner">
+  <svg class="banner-wave" viewBox="0 0 1200 40" preserveAspectRatio="none">
+    <path d="M 0,20 Q 150,5 300,20 T 600,20 T 900,20 T 1200,20" />
+    <path class="dash" d="M 0,20 Q 150,5 300,20 T 600,20 T 900,20 T 1200,20" />
+  </svg>
+  <h1>AI VEHICLE ECOSYSTEM</h1>
+  <p>Autonomous V2V Traffic Simulation Platform</p>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <a href="#overview">Overview</a>
+    <a href="#features">Features</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#stack">Stack</a>
+    <a href="#start">Getting Started</a>
+    <a href="#structure">Structure</a>
+    <a href="#deploy">Deploy</a>
+    <a href="#roadmap">Roadmap</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <h2><span class="icon i1">✦</span> Overview</h2>
+    <p class="tagline">
+      A real-time traffic simulation platform modeling an autonomous Vehicle-to-Vehicle (V2V) communication network across a detailed SVG-rendered city. Demonstrates decentralized traffic negotiation, congestion prediction, spoofing attack detection, valet parking orchestration, and voice-narrated situational awareness.
+    </p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+      <span class="badge">React 19</span>
+      <span class="badge purple">TypeScript</span>
+      <span class="badge orange">Framer Motion</span>
+      <span class="badge green">WebSocket</span>
+      <span class="badge">Express</span>
+      <span class="badge purple">pnpm</span>
+      <span class="badge orange">Vite</span>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <h2><span class="icon i2">◆</span> Core Features</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>🗺️ Real-Time City Map</h3>
+        <p>Interactive SVG city with 10+ nodes, roads, traffic lights, animated aircraft, harbour, and architectural landmarks — all with gradients, shadows, and glow effects.</p>
+        <ul>
+          <li>Downtown Core with 4-phase traffic signals</li>
+          <li>Airport with taxiing and departing aircraft</li>
+          <li>Harbour with animated ship and water body</li>
+          <li>Valet Parking Station with live occupancy</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="accent2">🚗 V2V Communication</h3>
+        <p>Vehicles negotiate right-of-way at intersections via handshake, yield, and priority messages — displayed in a live feed with animated communication beams.</p>
+      </div>
+      <div class="card">
+        <h3 class="accent3">🔮 TrafficProphet</h3>
+        <p>Click the <strong>+35 MIN FORECAST</strong> badge to see a ghost vehicle simulate its route, detect a Downtown bottleneck, and dynamically reroute — saving an estimated <strong>12 minutes</strong>.</p>
+      </div>
+      <div class="card">
+        <h3>🅿️ Valet Parking</h3>
+        <p>Synthetic valet vehicle navigates from Industrial Zone to Upper East parking with traffic-aware speed adjustment, automatic return trip, and P4 slot orchestration.</p>
+        <ul>
+          <li>28-second waypoint cycle</li>
+          <li>Slows when nearby vehicles detected</li>
+          <li>Parking booking, engagement &amp; release</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="accent2">🎙️ Voice Narration</h3>
+        <p>Web Speech API delivers spoken alerts for spoofing attacks, incidents, reroutes, low-fuel warnings, and parking events — with configurable urgency levels.</p>
+      </div>
+      <div class="card">
+        <h3 class="accent3">🛡️ Security Simulation</h3>
+        <ul>
+          <li><strong>Spoofing Attacks</strong> — malicious vehicles broadcast false priority scores; V2V network detects and blacklists them</li>
+          <li><strong>Incident Zones</strong> — road closures trigger rerouting; affected edges flash red with pulsing alerts</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section id="architecture">
+    <h2><span class="icon i3">⎔</span> Architecture</h2>
+    <div class="arch">
+      <span class="dim">┌────────────────────────────────────────────────────────────────────┐</span>
+      <span class="dim">│</span>                     <span class="hl1">BROWSER</span> <span class="dim">(React + Vite)</span>                     <span class="dim">│</span>
+      <span class="dim">│</span>  ┌──────────┐  ┌───────────┐  ┌────────┐  ┌──────────────────┐   <span class="dim">│</span>
+      <span class="dim">│</span>  │ City Map │  │ Dashboard │  │ Voice  │  │  Prediction      │   <span class="dim">│</span>
+      <span class="dim">│</span>  │ (SVG +   │  │ (HUD)     │  │ Narra- │  │  Demo + Ghost    │   <span class="dim">│</span>
+      <span class="dim">│</span>  │ Framer)  │  │           │  │ tion   │  │  Vehicle         │   <span class="dim">│</span>
+      <span class="dim">│</span>  └────<span class="hl1">┬</span>─────┘  └─────<span class="hl1">┬</span>─────┘  └───<span class="hl1">┬</span>────┘  └────────<span class="hl1">┬</span>─────────┘   <span class="dim">│</span>
+      <span class="dim">│</span>       └──────────────┴────────────┴─────────────────┘            <span class="dim">│</span>
+      <span class="dim">│</span>                            <span class="hl1">│</span> WebSocket / REST                    <span class="dim">│</span>
+      <span class="dim">├────────────────────────────┼────────────────────────────────────</span><span class="dim">┤</span>
+      <span class="dim">│</span>                    <span class="hl2">EXPRESS API SERVER</span>                             <span class="dim">│</span>
+      <span class="dim">│</span>  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────────┐   <span class="dim">│</span>
+      <span class="dim">│</span>  │Simulation│  │ V2V      │  │ Congestion│  │ Incident &amp;   │   <span class="dim">│</span>
+      <span class="dim">│</span>  │ Engine   │  │ Negoti-  │  │ Predictor │  │ Spoof Engine │   <span class="dim">│</span>
+      <span class="dim">│</span>  │          │  │ ation    │  │           │  │              │   <span class="dim">│</span>
+      <span class="dim">│</span>  └──────────┘  └──────────┘  └───────────┘  └──────────────┘   <span class="dim">│</span>
+      <span class="dim">└────────────────────────────────────────────────────────────────────┘</span>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section id="stack">
+    <h2><span class="icon i4">⚙</span> Tech Stack</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>Technology</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Frontend</strong></td><td>React 19, TypeScript, Vite, Framer Motion, Tailwind CSS</td></tr>
+          <tr><td><strong>Backend</strong></td><td>Express.js, WebSocket (ws), TypeScript</td></tr>
+          <tr><td><strong>Charts</strong></td><td>Recharts</td></tr>
+          <tr><td><strong>UI Primitives</strong></td><td>Radix UI (30+ components), Lucide Icons</td></tr>
+          <tr><td><strong>State</strong></td><td>React Query, custom WebSocket hook</td></tr>
+          <tr><td><strong>Package Manager</strong></td><td>pnpm (workspace monorepo)</td></tr>
+          <tr><td><strong>Build</strong></td><td>Vite, tsc</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- GETTING STARTED -->
+  <section id="start">
+    <h2><span class="icon i1">▶</span> Getting Started</h2>
+    <pre><span class="cmt"># Clone the monorepo</span>
+git clone https://github.com/jacksonvincent012-web/ai-vehicle-ecosystem.git
+<span class="cmd">cd</span> ai-vehicle-ecosystem
+
+<span class="cmt"># Install dependencies</span>
+pnpm install
+
+<span class="cmt"># Start the API server (port 3001)</span>
+pnpm --filter api-server dev
+
+<span class="cmt"># In another terminal, start the frontend (port 5173)</span>
+pnpm --filter vmind dev</pre>
+    <p style="margin-top:16px;color:var(--text-dim);font-size:14px">Open <strong style="color:var(--accent1)">http://localhost:5173</strong> to enter the command center.</p>
+  </section>
+
+  <!-- PROJECT STRUCTURE -->
+  <section id="structure">
+    <h2><span class="icon i2">📁</span> Project Structure</h2>
+    <pre>artifacts/
+├── <span class="hl3">api-server</span><span class="cmt">/          # Express + WebSocket simulation backend</span>
+│   ├── src/
+│   │   ├── <span class="str">index.ts</span>         # Server entry, WebSocket handler
+│   │   └── <span class="str">simulation.ts</span>    # Core simulation engine
+│   └── package.json
+│
+└── <span class="hl2">vmind</span><span class="cmt">/               # React frontend</span>
+    ├── src/
+    │   ├── components/
+    │   │   ├── <span class="str">CityMap.tsx</span>          # Full SVG city renderer
+    │   │   ├── <span class="str">PredictionDemo.tsx</span>   # Ghost vehicle forecast
+    │   │   ├── <span class="str">panels/</span>              # Dashboard widgets
+    │   │   └── <span class="str">ui/</span>                  # Radix UI primitives
+    │   ├── hooks/
+    │   │   ├── <span class="str">use-vmind-state.ts</span>   # Central state + valet injection
+    │   │   └── <span class="str">use-voice-narration.ts</span>
+    │   ├── pages/
+    │   │   └── <span class="str">Dashboard.tsx</span>        # Main HUD layout
+    │   └── <span class="str">lib/utils.ts</span>
+    └── package.json</pre>
+  </section>
+
+  <!-- DEPLOYMENT -->
+  <section id="deploy">
+    <h2><span class="icon i3">🚀</span> Deployment</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Vercel (Frontend)</h3>
+        <pre style="background:transparent;border:none;padding:0;margin:0;font-size:12px">pnpm add -g vercel
+<span class="cmd">cd</span> artifacts/vmind
+vercel deploy --prod</pre>
+      </div>
+      <div class="card">
+        <h3 class="accent3">Docker (API Server)</h3>
+        <pre style="background:transparent;border:none;padding:0;margin:0;font-size:12px"><span class="cmd">cd</span> artifacts/api-server
+docker build -t vmind-api .
+docker run -p 3001:3001 vmind-api</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap">
+    <h2><span class="icon i4">◈</span> Roadmap</h2>
+    <div class="roadmap-grid">
+      <div class="roadmap-item done">✓ City map with 10+ nodes and landmarks</div>
+      <div class="roadmap-item done">✓ V2V negotiation with animated beams</div>
+      <div class="roadmap-item done">✓ Congestion prediction with ghost vehicle</div>
+      <div class="roadmap-item done">✓ Security simulation (spoofing + incident)</div>
+      <div class="roadmap-item done">✓ Valet parking orchestration</div>
+      <div class="roadmap-item done">✓ Voice narration for events</div>
+      <div class="roadmap-item done">✓ SVG gradients, shadows, 3D realism</div>
+      <div class="roadmap-item todo">60fps smooth vehicle animation</div>
+      <div class="roadmap-item todo">Data-driven route prediction</div>
+      <div class="roadmap-item todo">Rain / fog environmental effects</div>
+      <div class="roadmap-item todo">React performance optimization</div>
+      <div class="roadmap-item todo">Dynamic valet routing via pathfinding</div>
+      <div class="roadmap-item todo">Click-to-follow vehicle camera</div>
+      <div class="roadmap-item todo">Live statistics HUD</div>
+      <div class="roadmap-item todo">Day/night cycle with automatic lighting</div>
+    </div>
+  </section>
+
+  <div class="glow-line"></div>
+
+</main>
+
+<footer class="footer">
+  <p>MIT — feel free to build on this.</p>
+  <p style="margin-top:8px;font-size:12px">
+    Built with TypeScript, React, and an unhealthy obsession with traffic flow.
+    <br>
+    <a href="https://github.com/jacksonvincent012-web/ai-vehicle-ecosystem">GitHub →</a>
+  </p>
+</footer>
+
+</body>
+</html>
