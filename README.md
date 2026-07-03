@@ -27,6 +27,8 @@
 
 <br/>
 
+**Live demo:** [https://vmind-five.vercel.app](https://vmind-five.vercel.app)
+
 **AI Vehicle Ecosystem** is a real-time traffic simulation platform that models an autonomous Vehicle-to-Vehicle (V2V) communication network across a detailed SVG-rendered city. It demonstrates decentralized traffic negotiation, congestion prediction, spoofing attack detection, valet parking orchestration, and voice-narrated situational awareness -- all within a single-page dashboard powered by a WebSocket-backed simulation engine.
 
 ---
