@@ -209,5 +209,5 @@ limitations under the License.
 ---
 
 <p align="center">
-  Copyright &copy; 2026 JacksonVincent. All rights reserved.
+  Copyright &copy; 2026 Jackson Vincent. All rights reserved.
 </p>
