@@ -27,69 +27,84 @@
 
 <br/>
 
-**AI Vehicle Ecosystem** is a real-time traffic simulation platform that models an autonomous Vehicle-to-Vehicle (V2V) communication network across a detailed SVG-rendered city. It demonstrates decentralized traffic negotiation, congestion prediction, spoofing attack detection, valet parking orchestration, and voice-narrated situational awareness — all within a single-page dashboard powered by a WebSocket-backed simulation engine.
+**AI Vehicle Ecosystem** is a real-time traffic simulation platform that models an autonomous Vehicle-to-Vehicle (V2V) communication network across a detailed SVG-rendered city. It demonstrates decentralized traffic negotiation, congestion prediction, spoofing attack detection, valet parking orchestration, and voice-narrated situational awareness -- all within a single-page dashboard powered by a WebSocket-backed simulation engine.
 
 ---
 
-## ✦ Architecture
+## Architecture
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│                         BROWSER (React + Vite)                     │
-│  ┌──────────┐  ┌───────────┐  ┌────────┐  ┌──────────────────┐   │
-│  │ City Map │  │ Dashboard │  │ Voice  │  │  Prediction      │   │
-│  │ (SVG +   │  │ (HUD)     │  │ Narra- │  │  Demo + Ghost    │   │
-│  │ Framer)  │  │           │  │ tion   │  │  Vehicle         │   │
-│  └────┬─────┘  └─────┬─────┘  └───┬────┘  └────────┬─────────┘   │
-│       └──────────────┴────────────┴─────────────────┘            │
-│                            │ WebSocket / REST                    │
-├────────────────────────────┼────────────────────────────────────┤
-│                    EXPRESS API SERVER                             │
-│  ┌──────────┐  ┌──────────┐  ┌───────────┐  ┌──────────────┐   │
-│  │Simulation│  │ V2V      │  │ Congestion│  │ Incident &   │   │
-│  │ Engine   │  │ Negoti-  │  │ Predictor │  │ Spoof Engine │   │
-│  │          │  │ ation    │  │           │  │              │   │
-│  └──────────┘  └──────────┘  └───────────┘  └──────────────┘   │
-└────────────────────────────────────────────────────────────────────┘
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {
+  'lineColor': '#00eeff30',
+  'primaryColor': '#0e0e28',
+  'primaryTextColor': '#ffffff',
+  'primaryBorderColor': '#00eeff40',
+  'secondaryColor': '#0a0a1a',
+  'secondaryBorderColor': '#aa44ff40',
+  'tertiaryColor': '#060618',
+  'tertiaryBorderColor': '#ff660040'
+}}}%%
+
+flowchart TB
+    subgraph BROWSER["Browser (React + Vite)"]
+        direction TB
+        CM["City Map<br/><span style='font-size:10px'>SVG + Framer Motion</span>"]:::browser
+        DB["Dashboard<br/><span style='font-size:10px'>HUD + Recharts</span>"]:::browser
+        VN["Voice<br/><span style='font-size:10px'>Web Speech API</span>"]:::browser
+        PD["Prediction Demo<br/><span style='font-size:10px'>Ghost Vehicle</span>"]:::browser
+    end
+
+    subgraph API["Express API Server"]
+        direction TB
+        SE["Simulation Engine"]:::api
+        VN2["V2V Negotiation"]:::api
+        CP["Congestion Predictor"]:::api
+        IS["Incident &amp; Spoof Engine"]:::api
+    end
+
+    BROWSER <==>|"WebSocket / REST"| API
+
+    classDef browser fill:#0e0e28,stroke:#00eeff,stroke-width:2px,color:#ffffff
+    classDef api fill:#0a0a1a,stroke:#aa44ff,stroke-width:2px,color:#ffffff
 ```
 
 ---
 
-## ✦ Core Features
+## Core Features
 
-### 🗺️ Real‑Time City Map
-An interactive SVG city with 10+ nodes, roads, traffic lights, buildings, and landmarks — all rendered with gradients, drop shadows, and glow effects:
+### Real-Time City Map
+An interactive SVG city with 10+ nodes, roads, traffic lights, buildings, and landmarks -- all rendered with gradients, drop shadows, and glow effects:
 
-- **Downtown Core** with animated 4‑phase traffic signals (Green → Amber → Red)
+- **Downtown Core** with animated 4-phase traffic signals (Green, Amber, Red)
 - **Airport** with taxiing and departing aircraft
 - **Harbour** with animated ship and water body
-- **University, Stadium, Central Market, Riverside Grill, Parking Garage** — each with distinct architectural styling
-- **Valet Parking Station** with 4 parking spots (P1–P4) and live occupancy status
+- **University, Stadium, Central Market, Riverside Grill, Parking Garage** -- each with distinct architectural styling
+- **Valet Parking Station** with 4 parking spots (P1-P4) and live occupancy status
 
-### 🚗 V2V Communication Network
+### V2V Communication Network
 Vehicles negotiate right-of-way at intersections via handshake/yield/priority messages, displayed in a live feed with animated communication beams.
 
-### 🔮 TrafficProphet Prediction
-Click the **+35 MIN FORECAST** badge on any vehicle to see a ghost vehicle simulate its route, detect a Downtown bottleneck, and dynamically reroute — saving an estimated **12 minutes**.
+### TrafficProphet Prediction
+Click the **+35 MIN FORECAST** badge on any vehicle to see a ghost vehicle simulate its route, detect a Downtown bottleneck, and dynamically reroute -- saving an estimated **12 minutes**.
 
-### 🅿️ Valet Parking Orchestration
-A client‑side synthetic valet vehicle navigates the road network from Industrial Zone to Upper East parking, demonstrating:
+### Valet Parking Orchestration
+A client-side synthetic valet vehicle navigates the road network from Industrial Zone to Upper East parking, demonstrating:
 
-- Time‑based waypoint traversal (28‑second cycle)
-- Traffic‑aware speed adjustment (slows when nearby vehicles detected)
+- Time-based waypoint traversal (28-second cycle)
+- Traffic-aware speed adjustment (slows when nearby vehicles detected)
 - Automatic return trip with reverse waypoints
 - P4 parking slot booking, engagement, and release
 
-### 🎙️ Voice Narration
-Web Speech API integration delivers spoken alerts for spoofing attacks, incidents, reroutes, low‑fuel warnings, and parking events — with configurable urgency levels.
+### Voice Narration
+Web Speech API integration delivers spoken alerts for spoofing attacks, incidents, reroutes, low-fuel warnings, and parking events -- with configurable urgency levels.
 
-### 🛡️ Security Simulation
+### Security Simulation
 - **Spoofing Attacks**: Malicious vehicles broadcast false priority scores; V2V network detects and blacklists them
 - **Incident Zones**: Road closures trigger rerouting; affected edges flash red with pulsing alerts
 
 ---
 
-## ✦ Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -103,11 +118,11 @@ Web Speech API integration delivers spoken alerts for spoofing attacks, incident
 
 ---
 
-## ✦ Getting Started
+## Getting Started
 
 ```bash
 # Clone the monorepo
-git clone https://github.com/your-org/ai-vehicle-ecosystem.git
+git clone https://github.com/jacksonvincent012-web/ai-vehicle-ecosystem.git
 cd ai-vehicle-ecosystem
 
 # Install dependencies
@@ -124,7 +139,7 @@ Open `http://localhost:5173` to enter the command center.
 
 ---
 
-## ✦ Project Structure
+## Project Structure
 
 ```
 artifacts/
@@ -152,7 +167,7 @@ artifacts/
 
 ---
 
-## ✦ Deployment
+## Deployment
 
 ### Vercel (Frontend)
 
@@ -175,7 +190,7 @@ docker run -p 3001:3001 vmind-api
 
 ---
 
-## ✦ Roadmap
+## Roadmap
 
 - [x] City map with 10+ nodes and landmarks
 - [x] V2V negotiation with animated communication beams
@@ -186,19 +201,19 @@ docker run -p 3001:3001 vmind-api
 - [x] SVG gradients, shadows, 3D effects for realism
 
 - [ ] **60fps smooth vehicle animation** (requestAnimationFrame interpolation)
-- [ ] **Data‑driven route prediction** (use real congestion data)
+- [ ] **Data-driven route prediction** (use real congestion data)
 - [ ] **Rain / fog environmental effects**
 - [ ] **React performance optimization** (memoization, virtual list)
 - [ ] **Dynamic valet routing** via pathfinding
-- [ ] **Click‑to‑follow vehicle camera**
+- [ ] **Click-to-follow vehicle camera**
 - [ ] **Live statistics HUD** (avg speed, ETA, fleet metrics)
 - [ ] **Light / dark mode with automatic day/night cycle**
 
 ---
 
-## ✦ License
+## License
 
-MIT — feel free to build on this.
+MIT -- feel free to build on this.
 
 <p align="center">
   <sub>Built with TypeScript, React, and an unhealthy obsession with traffic flow.</sub>
