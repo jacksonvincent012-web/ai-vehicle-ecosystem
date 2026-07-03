@@ -119,7 +119,6 @@ pnpm --filter api-server dev   # terminal 1: API on :3001
 pnpm --filter vmind dev        # terminal 2: UI on :5173
 ```
 
-Open [http://localhost:5173](http://localhost:5173).
 
 ---
 
