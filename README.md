@@ -38,40 +38,27 @@
 ## Architecture
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {
-  'background': '#ffffff',
-  'lineColor': '#0066ff30',
-  'primaryColor': '#f0f4ff',
-  'primaryTextColor': '#000000',
-  'primaryBorderColor': '#0066ff',
-  'secondaryColor': '#ffffff',
-  'secondaryBorderColor': '#0066ff60',
-  'tertiaryColor': '#000000',
-  'tertiaryBorderColor': '#0066ff',
-  'fontSize': '14px'
-}}}%%
-
 flowchart TB
     subgraph BROWSER["Browser (React + Vite)"]
         direction TB
-        CM["<b>City Map</b><br/><span style='font-size:11px;color:#555'>SVG + Framer Motion</span>"]:::browser
-        DB["<b>Dashboard</b><br/><span style='font-size:11px;color:#555'>HUD + Recharts</span>"]:::browser
-        VN["<b>Voice</b><br/><span style='font-size:11px;color:#555'>Web Speech API</span>"]:::browser
-        PD["<b>Prediction Demo</b><br/><span style='font-size:11px;color:#555'>Ghost Vehicle</span>"]:::browser
+        CM["City Map\nSVG + Framer Motion"]:::browser
+        DB["Dashboard\nHUD + Recharts"]:::browser
+        VN["Voice\nWeb Speech API"]:::browser
+        PD["Prediction Demo\nGhost Vehicle"]:::browser
     end
 
     subgraph API["Express API Server"]
         direction TB
-        SE["<b>Simulation Engine</b>"]:::api
-        VN2["<b>V2V Negotiation</b>"]:::api
-        CP["<b>Congestion Predictor</b>"]:::api
-        IS["<b>Incident &amp; Spoof Engine</b>"]:::api
+        SE["Simulation Engine"]:::api
+        VN2["V2V Negotiation"]:::api
+        CP["Congestion Predictor"]:::api
+        IS["Incident & Spoof Engine"]:::api
     end
 
     BROWSER <==>|"WebSocket / REST"| API
 
-    classDef browser fill:#e8f0fe,stroke:#0066ff,stroke-width:2px,color:#000000
-    classDef api fill:#f8f9fa,stroke:#000000,stroke-width:2px,color:#000000
+    classDef browser fill:#e8f0fe,stroke:#0066ff,stroke-width:2px,color:#000
+    classDef api fill:#f8f9fa,stroke:#000,stroke-width:2px,color:#000
 ```
 
 ---
